@@ -31,3 +31,18 @@ class Director::Handler::MyCustomHandler < Base
   end
 end
 ```
+
+### Source/Target Record
+An alias can also be linked to a record at both the source and target end of the alias. Linked records allow for automatic updating of the corresponding path. When the record is saved, it runs a method that updates all incoming and outgoing aliases.
+
+```ruby
+class MyModel < ActiveRecord::Base
+  has_aliased_paths canonical_path: :path # Accepts a symbol, proc, or object that responds to `#canonical_path`
+
+  private
+
+  def path
+    # Return the path that routes to this record
+  end
+end
+```

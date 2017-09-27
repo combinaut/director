@@ -6,11 +6,13 @@
 module Director
   module ModelExtensions
     module ActMethod
-      def has_aliases
+      def has_aliased_paths(canonical_path: )
         extend ClassMethods
         include Associations
         include Callbacks
         include InstanceMethods
+
+        self.aliased_paths_options = { canonical_path: canonical_path }
       end
     end
 
@@ -24,6 +26,8 @@ module Director
       def self.included(base)
         base.has_many :incoming_aliases, class_name: 'Director::Alias', foreign_key: :target, dependent: :delete_all
         base.has_many :outgoing_aliases, class_name: 'Director::Alias', foreign_key: :source, dependent: :delete_all
+
+        class_attribute :aliased_paths_options
       end
     end
 
@@ -32,14 +36,10 @@ module Director
         base.after_save :update_aliased_paths
       end
 
-      def path_alias
-        raise NotImplementedError, "Should return a string representing the path alias that would route to this record"
-      end
-
       private
 
       def update_aliased_paths
-        path = path_alias
+        path = HelperMethods.generate_canonical_path(self, aliased_paths_options[:canonical_path])
         update_incoming_alias_paths(path)
         update_outgoing_alias_paths(path)
       end
@@ -50,6 +50,21 @@ module Director
 
       def update_outgoing_alias_paths(path)
         outgoing_aliases.with_source_path.update_all(source_path: path)
+      end
+    end
+
+    module HelperMethods
+      def self.generate_canonical_path(record, canonical_path)
+        case canonical_path
+        when Symbol
+          record.send(canonical_path)
+        when Proc
+          canonical_path.call(record)
+        when String
+          canonical_path
+        else # Assume it's an object that responds to canonical_path
+          canonical_path.send(:canonical_path)
+        end
       end
     end
   end
