@@ -6,15 +6,15 @@ alias list stored in the database. It has two basic handlers, but can be extende
 ## Usage
 
 ### Proxy
-If you want to create a vanity path, where the contents of one page appears at a new path, use a `proxy` handler.
+If you want to create a vanity path, where the contents of one page appears at a new path, use a `proxy` handler. The user agent will show the vanity path in the url bar, but the contents of the target path will appear on the page.
 ```ruby
 Director::Alias.create(source_path: '/vanity/path', target_path: 'real/path', handler: :proxy)
 ```
 
 ### Redirect
-If you want to redirect a deprecated or non-canonical path to the canonical path, use a `redirect` handler.
+If you want to redirect a deprecated or non-canonical path to the canonical path, use a `redirect` handler. The user agent will show the target path in the url bar and the contents of the target path will appear on the page.
 ```ruby
-Director::Alias.create(source_path: '/deprecated/path', target_path: 'new/path', handler: :redirect) # => Redirects internally without changing client url
+Director::Alias.create(source_path: '/deprecated/path', target_path: 'new/path', handler: :redirect)
 ```
 
 ### Custom Alias Handlers
