@@ -1,5 +1,6 @@
 # TEST: individual handlers work when a target_path is present
-#       individual handlers work when only a target is present
+# TEST: individual handlers work when only a target is present
+# TEST: individual handlers can redirect to "" without looping indefinitely
 
 module Director
   module Handler

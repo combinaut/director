@@ -2,6 +2,7 @@
 #       doesn't update paths of aliases with blank corresponding path
 #       incoming and outgoing alias associations work
 #       path_alias is used to update the source and target path
+#       blank aliases are ignored when saving
 
 module Director
   module ModelExtensions
@@ -23,11 +24,15 @@ module Director
     end
 
     module Associations
-      def self.included(base)
-        base.has_many :incoming_aliases, class_name: 'Director::Alias', foreign_key: :target, dependent: :delete_all
-        base.has_many :outgoing_aliases, class_name: 'Director::Alias', foreign_key: :source, dependent: :delete_all
+      BLANK_ALIAS = ->(attributes) { Director::Alias.new(attributes).blank? }
 
-        class_attribute :aliased_paths_options
+      def self.included(base)
+        base.has_many :incoming_aliases, class_name: 'Director::Alias', as: :target, dependent: :delete_all
+        base.has_one :outgoing_alias, class_name: 'Director::Alias', as: :source, dependent: :delete
+
+        base.class_attribute :aliased_paths_options
+        base.accepts_nested_attributes_for :incoming_aliases, reject_if: BLANK_ALIAS, allow_destroy: true
+        base.accepts_nested_attributes_for :outgoing_alias, reject_if: BLANK_ALIAS, allow_destroy: true
       end
     end
 
@@ -36,10 +41,24 @@ module Director
         base.after_save :update_aliased_paths
       end
 
+      def generate_canonical_path
+        generator = aliased_paths_options[:canonical_path]
+        case generator
+        when Symbol
+          send(generator)
+        when Proc
+          generator.call(self)
+        when String
+          generator
+        else # Assume it's an object that responds to canonical_path
+          generator.send(:canonical_path)
+        end
+      end
+
       private
 
       def update_aliased_paths
-        path = HelperMethods.generate_canonical_path(self, aliased_paths_options[:canonical_path])
+        path = generate_canonical_path
         update_incoming_alias_paths(path)
         update_outgoing_alias_paths(path)
       end
@@ -49,22 +68,7 @@ module Director
       end
 
       def update_outgoing_alias_paths(path)
-        outgoing_aliases.with_source_path.update_all(source_path: path)
-      end
-    end
-
-    module HelperMethods
-      def self.generate_canonical_path(record, canonical_path)
-        case canonical_path
-        when Symbol
-          record.send(canonical_path)
-        when Proc
-          canonical_path.call(record)
-        when String
-          canonical_path
-        else # Assume it's an object that responds to canonical_path
-          canonical_path.send(:canonical_path)
-        end
+        outgoing_alias.update_columns(source_path: path) if outgoing_alias&.source_path?
       end
     end
   end
