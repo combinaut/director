@@ -19,7 +19,10 @@ module Director
 
 
     def handler_class
-      "Director::Handler::#{handler.classify}".constantize
+      handler_name = "Director::Handler::#{handler.classify}"
+      handler_name.constantize
+    rescue NameError
+      raise MissingAliasHandler, "Handler not found '#{handler_name}'"
     end
 
     def effective_target_path
@@ -36,4 +39,9 @@ module Director
       self.source_path = source.generate_canonical_path if source
     end
   end
+
+  # EXCEPTIONS
+
+  class DirectorException < StandardError; end
+  class MissingAliasHandler < DirectorException; end
 end

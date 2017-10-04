@@ -15,3 +15,6 @@ require 'director'
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
 end
+
+# Load all spec support files
+Dir[File.expand_path("../support/**/*.rb", __FILE__)].each {|f| require f }
