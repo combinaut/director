@@ -1,4 +1,3 @@
-if defined?(Rails)
-  require 'director/railtie'
-  require 'director/engine'
-end
+require 'rails'
+require 'director/railtie'
+require 'director/engine'
