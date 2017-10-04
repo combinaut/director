@@ -8,7 +8,7 @@ module Director
       attr_reader :alias_entry
 
       def self.for(alias_entry)
-        return Director::Handler::NoAlias unless alias_entry
+        return Director::Handler::Passthrough unless alias_entry
         alias_entry.handler_class
       end
 

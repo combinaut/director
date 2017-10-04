@@ -1,6 +1,6 @@
 module Director
   module Handler
-    class NoAlias < Base
+    class Passthrough < Base
       def response(app, env)
         app.call(env)
       end

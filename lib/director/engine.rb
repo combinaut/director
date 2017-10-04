@@ -1,5 +1,5 @@
 require 'director/handlers/base'
-require 'director/handlers/no_alias'
+require 'director/handlers/passthrough'
 require 'director/handlers/proxy'
 require 'director/handlers/redirect'
 require 'director/model_extensions'
