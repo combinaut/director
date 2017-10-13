@@ -23,7 +23,7 @@ module Director
       private
 
       def target_path
-        alias_entry.effective_target_path
+        alias_entry.target_path
       end
     end
   end

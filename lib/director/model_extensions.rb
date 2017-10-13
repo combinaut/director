@@ -64,11 +64,11 @@ module Director
       end
 
       def update_incoming_alias_paths(path)
-        incoming_aliases.with_target_path.update_all(target_path: path)
+        Alias.where(target: self).update_all(target_path: path)
       end
 
       def update_outgoing_alias_paths(path)
-        outgoing_alias.update_columns(source_path: path) if outgoing_alias&.source_path?
+        Alias.where(source: self).update_all(source_path: path)
       end
     end
   end

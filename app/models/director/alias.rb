@@ -26,10 +26,6 @@ module Director
       raise MissingAliasHandler, "Handler not found '#{handler_name}'"
     end
 
-    def effective_target_path
-      target_path || generate_canonical_path(source, source.aliased_paths_options[]) .path_alias
-    end
-
     def blank?
       !(source_path? || target_path? || source || target)
     end
