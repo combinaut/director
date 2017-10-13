@@ -1,9 +1,5 @@
 # TODO: Add pattern validation to allow base app to configure path whitelist
 # TODO: Add ability to limit formats so assets, json, etc. can be ignored if desired
-# TEST: source_path is set if a source record is provided
-# TEST: target_path is set if a target record is provided
-# TEST: can't create cycle
-
 module Director
   class Alias < ActiveRecord::Base
     belongs_to :source, polymorphic: true

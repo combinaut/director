@@ -1,9 +1,3 @@
-# TEST: updates aliases after saving
-#       doesn't update paths of aliases with blank corresponding path
-#       incoming and outgoing alias associations work
-#       path_alias is used to update the source and target path
-#       blank aliases are ignored when saving
-
 module Director
   module ModelExtensions
     module ActMethod
