@@ -91,5 +91,26 @@ describe Director::Middleware do
         expect { mock_request.send(request_method, request_path) }.to raise_exception(Director::MissingAliasHandler)
       end
     end
+
+    context 'when a matching alias exists but the request format is not in the whitelist' do
+      before { Director::Alias.create!(source_path: request_path, target_path: target_path, handler: 'redirect') }
+      before { allow(Director::Configuration.constraints.format).to receive(:only).and_return(:jpg) }
+
+      it_should_behave_like 'a pass-through middleware', request_path
+    end
+
+    context 'when a matching alias exists but the request format is in the blacklist' do
+      before { Director::Alias.create!(source_path: request_path, target_path: target_path, handler: 'redirect') }
+      before { allow(Director::Configuration.constraints.format).to receive(:except).and_return(:html) }
+
+      it_should_behave_like 'a pass-through middleware', request_path
+    end
+
+    context 'when a matching alias exists and the request format is in the whitelist' do
+      before { Director::Alias.create!(source_path: request_path, target_path: target_path, handler: 'redirect') }
+      before { allow(Director::Configuration.constraints.format).to receive(:only).and_return(:html) }
+
+      it_should_behave_like 'a redirect middleware', request_path, target_path
+    end
   end
 end

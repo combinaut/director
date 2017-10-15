@@ -7,11 +7,6 @@ module Director
     class Base
       attr_reader :alias_entry
 
-      def self.for(alias_entry)
-        return Director::Handler::Passthrough unless alias_entry
-        alias_entry.handler_class
-      end
-
       def initialize(alias_entry)
         @alias_entry = alias_entry
       end

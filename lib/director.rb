@@ -1,3 +1,6 @@
 require 'rails'
+require 'director/helpers'
+require 'director/handler'
+require 'director/configuration'
 require 'director/railtie'
 require 'director/engine'

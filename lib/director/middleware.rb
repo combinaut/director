@@ -5,9 +5,9 @@ module Director
     end
 
     def call(env)
-      alias_entry = find_alias(Rack::Request.new(env).path_info)
-      response = handle_alias(alias_entry, env)
-      return response
+      @request = Rack::Request.new(env)
+      alias_entry = find_alias(@request.path_info) unless ignored_format?(format)
+      return handle_alias(alias_entry, env)
     end
 
     private
@@ -17,8 +17,15 @@ module Director
     end
 
     def handle_alias(alias_entry, env)
-      handler = Director::Handler::Base.for(alias_entry)
-      return handler.new(alias_entry).response(@app, env)
+      return Handler.for(alias_entry).new(alias_entry).response(@app, env)
+    end
+
+    def ignored_format?(format)
+      !Helpers.matches_constraint?(Configuration.constraints.format, format)
+    end
+
+    def format
+      @request.path_info[/\.([^.]+)$/] || 'html'
     end
   end
 end

@@ -46,3 +46,16 @@ class MyModel < ActiveRecord::Base
   end
 end
 ```
+
+## Constraints
+There are several constraints that can be applied to limit which requests are handled. Each constraint consists of a
+whitelist and a blacklist that can be independently configured.
+
+### Format
+The format constraint looks at the request extension. This can be used to ignore asset requests or only apply aliasing
+to HTML requests.
+```ruby
+Director::Configuration.constraints.format.only = [:html, :xml]
+# or
+Director::Configuration.constraints.format.except = :jpg
+```
