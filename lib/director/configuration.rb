@@ -8,8 +8,8 @@ module Director
 
     # Defaults
     @@constraints = OpenStruct.new({
-      source: Constraint.new,
-      target: Constraint.new,
+      source_path: Constraint.new,
+      target_path: Constraint.new,
       format: Constraint.new
     }).freeze
   end

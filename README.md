@@ -59,3 +59,23 @@ Director::Configuration.constraints.format.only = [:html, :xml]
 # or
 Director::Configuration.constraints.format.except = :jpg
 ```
+
+### Source Path
+The source constraint limits what can be entered as a source path in an `Alias`. This can be useful if you want to
+prevent aliasing of certain routes, like an admin namespace for example. `only` and `except` are passed to `validates_format_of`
+validations on the Alias model, and accept any patterns the `:with` and `:without` options of that validator.
+```ruby
+Director::Configuration.constraints.source_path.only = %r{\A/pages/}
+# or
+Director::Configuration.constraints.source_path.except = %r{\A/admin/}
+```
+
+### Target Path
+The target constraint limits what can be entered as a target path in an `Alias`. This can be useful if you want to
+prevent aliasing of certain routes, like an admin namespace for example. `only` and `except` are passed to `validates_format_of`
+validations on the Alias model, and accept any patterns the `:with` and `:without` options of that validator.
+```ruby
+Director::Configuration.constraints.target_path.only = %r{\A/pages/}
+# or
+Director::Configuration.constraints.target_path.except = %r{\A/admin/}
+```
