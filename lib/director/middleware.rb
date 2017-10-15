@@ -25,7 +25,7 @@ module Director
     end
 
     def format
-      @request.path_info[/\.([^.]+)$/] || 'html'
+      @request.path_info[/\.([^.]+)$/, 1] || 'html'
     end
   end
 end
