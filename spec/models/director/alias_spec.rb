@@ -43,5 +43,9 @@ describe Director::Alias do
       allow(Director::Configuration.constraints.source_path).to receive(:only).and_return(%r{/this/is/a/test})
       expect { subject.source_path = '/this/is/a/test' }.to change { subject.valid? }.to true
     end
+
+    it 'returns false if the handler does not exist' do
+      expect { subject.handler = 'FakeHandler' }.to change { subject.valid? }.to false
+    end
   end
 end

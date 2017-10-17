@@ -9,7 +9,7 @@ module Director
     validates_format_of :source_path, without: Configuration.constraints.source_path.except
     validates_format_of :target_path, with: Configuration.constraints.target_path.only
     validates_format_of :target_path, without: Configuration.constraints.target_path.except
-    validates_presence_of :handler
+    validate :valid_handler
 
     scope :with_source_path, -> { where.not(source_path: nil) }
     scope :with_target_path, -> { where.not(target_path: nil) }
@@ -44,6 +44,12 @@ module Director
 
     def target_changed?
       target_id_changed? || target_type_changed?
+    end
+
+    def valid_handler
+      handler_class
+    rescue MissingAliasHandler
+      errors.add(:handler, 'not defined')
     end
   end
 
