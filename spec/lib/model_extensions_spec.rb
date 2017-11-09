@@ -55,6 +55,13 @@ describe Director::ModelExtensions do
     end
 
     it 'ignores blank nested attributes for outgoing_alias'
+
+    it 'accepts nested attributes for outgoing_alias' do
+      target = ModelExtensionsRecordMock.create
+      subject.outgoing_alias_attributes = { target_id: target.id, target_type: target.class.name, handler: :redirect }
+      subject.save!
+      expect(subject.outgoing_alias).to have_attributes(source_path: be_present)
+    end
   end
 
   describe '#destroy' do

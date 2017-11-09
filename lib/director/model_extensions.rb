@@ -21,8 +21,8 @@ module Director
       BLANK_ALIAS = ->(attributes) { Director::Alias.new(attributes).blank? }
 
       def self.included(base)
-        base.has_many :incoming_aliases, class_name: 'Director::Alias', as: :target, dependent: :delete_all
-        base.has_one :outgoing_alias, class_name: 'Director::Alias', as: :source, dependent: :delete
+        base.has_many :incoming_aliases, class_name: 'Director::Alias', as: :target, dependent: :delete_all, inverse_of: :target
+        base.has_one :outgoing_alias, class_name: 'Director::Alias', as: :source, dependent: :delete, inverse_of: :source
 
         base.class_attribute :aliased_paths_options
         base.accepts_nested_attributes_for :incoming_aliases, reject_if: BLANK_ALIAS, allow_destroy: true
