@@ -34,7 +34,19 @@ describe Director::Alias do
       expect { subject.save }.not_to change { subject.target_path }
     end
 
-    it 'does raises an exception if redirection aliases would result in a loop'
+    it 'sets the target_path if a target is already present, even if a target_path is set to something else' do
+      subject.update_attribute(:target, record)
+      subject.attributes = { target_path: 'asdf' }
+      expect { subject.save }.to change { subject.target_path }.to record.canonical_path
+    end
+
+    it 'sets the source_path if a source is already present, even if a source_path is set to something else' do
+      subject.update_attribute(:source, record)
+      subject.attributes = { source_path: 'asdf' }
+      expect { subject.save }.to change { subject.source_path }.to record.canonical_path
+    end
+
+    it 'raises an exception if redirection aliases would result in a loop'
   end
 
   describe '#valid?' do

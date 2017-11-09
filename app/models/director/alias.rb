@@ -39,11 +39,11 @@ module Director
     end
 
     def source_changed?
-      source_id_changed? || source_type_changed?
+      source_path_changed? || source_id_changed? || source_type_changed?
     end
 
     def target_changed?
-      target_id_changed? || target_type_changed?
+      target_path_changed? || target_id_changed? || target_type_changed?
     end
 
     def valid_handler
