@@ -6,7 +6,7 @@ module Director
 
     def call(env)
       @request = Rack::Request.new(env)
-      alias_entry = find_alias(@request.path_info) unless ignored_format?(format)
+      alias_entry = find_alias(request_path) unless ignored?
       return handle_alias(alias_entry, env)
     end
 
@@ -20,12 +20,24 @@ module Director
       return Handler.for(alias_entry).new(alias_entry).response(@app, env)
     end
 
+    def ignored?
+      ignored_format?(format) || ignored_path?(request_path)
+    end
+
     def ignored_format?(format)
-      !Helpers.matches_constraint?(Configuration.constraints.format, format)
+      !Helpers.matches_constraint?(Configuration.constraints.format, format, coerce: :to_s)
+    end
+
+    def ignored_path?(path)
+      !Helpers.matches_constraint?(Configuration.constraints.source_path, path)
     end
 
     def format
-      @request.path_info[/\.([^.]+)$/, 1] || 'html'
+      request_path[/\.([^.]+)$/, 1] || 'html'
+    end
+
+    def request_path
+      @request.path_info
     end
   end
 end
