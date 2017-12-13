@@ -69,6 +69,8 @@ Director::Configuration.constraints.source_path.only = %r{\A/pages/}
 # or
 Director::Configuration.constraints.source_path.except = %r{\A/admin/}
 ```
+NOTE: This constraint will also limit what requests perform an alias lookup. If a constraint is added, it will effectively
+disable existing aliases that do not match the new constraint.
 
 ### Target Path
 The target constraint limits what can be entered as a target path in an `Alias`. This can be useful if you want to
