@@ -24,8 +24,20 @@ describe Director::Middleware do
   shared_examples_for 'a redirect middleware' do |request_path, target_path|
     let(:response) { mock_request.send(request_method, request_path) }
 
-    it 'should redirect to target_path' do
-      expect(response).to have_attributes(location: target_path, status: 302)
+    it 'responds with a redirect' do
+      expect(response).to have_attributes(status: 302)
+    end
+
+    it 'includes the target_path in the redirect location' do
+      expect(response).to have_attributes(location: include(URI(target_path).path), status: 302)
+    end
+
+    it 'includes the target query in the redirect location' do
+      expect(response).to have_attributes(location: include(URI(target_path).query.to_s))
+    end
+
+    it 'includes the request query in the redirect location' do
+      expect(response).to have_attributes(location: include(URI(request_path).query.to_s))
     end
   end
 
@@ -35,11 +47,19 @@ describe Director::Middleware do
     end
 
     it 'should set the path to the target_path' do
-      expect(request.path_info).to eq(target_path)
+      expect(request.path_info).to eq(URI(target_path).path)
     end
 
     it 'should not modify the request_method' do
       expect(request.request_method).to eq(request_method.to_s.upcase)
+    end
+
+    it 'proxies the incoming request query' do
+      expect(request.query_string).to include(URI(request_path).query.to_s)
+    end
+
+    it 'retains the target path query' do
+      expect(request.query_string).to include(URI(target_path).query.to_s)
     end
   end
 
@@ -63,12 +83,28 @@ describe Director::Middleware do
       before { Director::Alias.create!(source_path: request_path, target_path: target_path, handler: 'redirect') }
 
       it_behaves_like 'a redirect middleware', request_path, target_path
+
+      context 'when a query is present in the request and target urls' do
+        request_path_with_query = request_path + "?request_param=1"
+        target_path_with_query = target_path + "?target_param=2"
+        before { Director::Alias.where(source_path: request_path).update_all(target_path: target_path_with_query) }
+
+        it_behaves_like 'a redirect middleware', request_path_with_query, target_path_with_query
+      end
     end
 
     context 'when a matching proxy alias exists' do
       before { Director::Alias.create!(source_path: request_path, target_path: target_path, handler: 'proxy') }
 
       it_behaves_like 'a proxy middleware', request_path, target_path
+
+      context 'when a query is present in the request and target urls' do
+        request_path_with_query = request_path + "?request_param=1"
+        target_path_with_query = target_path + "?target_param=2"
+        before { Director::Alias.where(source_path: request_path).update_all(target_path: target_path_with_query) }
+
+        it_behaves_like 'a proxy middleware', request_path_with_query, target_path_with_query
+      end
     end
 
     context 'when a matching custom alias exists' do

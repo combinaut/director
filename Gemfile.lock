@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     director (0.2.0)
-      rails (~> 4.2)
+      rails (>= 4.2)
 
 GEM
   remote: http://rubygems.org/
@@ -143,4 +143,4 @@ DEPENDENCIES
   sqlite3
 
 BUNDLED WITH
-   1.16.0
+   1.16.1

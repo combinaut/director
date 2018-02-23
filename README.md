@@ -47,6 +47,10 @@ class MyModel < ActiveRecord::Base
 end
 ```
 
+### Url params
+Url "params" or "query" from the request will be passed on and merged with target path. Any url params in the target path
+will be preserved.
+
 ## Constraints
 There are several constraints that can be applied to limit which requests are handled. Each constraint consists of a
 whitelist and a blacklist that can be independently configured.
