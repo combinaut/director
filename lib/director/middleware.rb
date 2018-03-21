@@ -13,7 +13,16 @@ module Director
     private
 
     def find_alias(source_path)
-      Director::Alias.find_by_source_path(source_path)
+      found = []
+
+      # Traverse a chain of aliases
+      while alias_entry = Director::Alias.find_by_source_path(source_path) do
+        raise AliasLoopException, found.map(&:source_path).joins(' -> ') + source_path if found.include?(alias_entry)
+        found << alias_entry
+        source_path = alias_entry.target_path
+      end
+
+      return found.last
     end
 
     def handle_alias(alias_entry, env)
@@ -40,4 +49,8 @@ module Director
       @request.path_info
     end
   end
+
+  # EXCEPTIONS
+
+  class AliasLoopException < StandardError; end
 end
