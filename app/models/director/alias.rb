@@ -17,6 +17,21 @@ module Director
     before_save :set_source_path, if: :source_changed?
     before_save :set_target_path, if: :target_changed?
 
+    # Returns the alias matching the source_path, traversing any chained aliases and returning the last one
+    def self.resolve(source_path)
+      found = []
+
+      # Traverse a chain of aliases
+      while alias_entry = find_by_source_path(source_path) do
+        raise AliasChainLoop, found.map(&:source_path).joins(' -> ') + source_path if found.include?(alias_entry)
+        found << alias_entry
+        source_path = alias_entry.target_path
+      end
+
+      return found.last
+    end
+
+
     def handler_class
       handler_name = "Director::Handler::#{handler.classify}"
       handler_name.constantize
@@ -57,4 +72,5 @@ module Director
 
   class DirectorException < StandardError; end
   class MissingAliasHandler < DirectorException; end
+  class AliasChainLoop < DirectorException; end
 end
