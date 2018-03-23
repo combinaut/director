@@ -17,6 +17,10 @@ module Director
     before_save :set_source_path, if: :source_changed?
     before_save :set_target_path, if: :target_changed?
 
+    def self.resolve_with_constraint(source_path, request)
+      merge(Configuration.constraints.lookup_scope.call(request)).resolve(source_path)
+    end
+
     # Returns the alias matching the source_path, traversing any chained aliases and returning the last one
     def self.resolve(source_path)
       found = []

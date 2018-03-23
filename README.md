@@ -89,3 +89,21 @@ Director::Configuration.constraints.target_path.only = %r{\A/pages/}
 # or
 Director::Configuration.constraints.target_path.except = %r{\A/admin/}
 ```
+
+### Lookup Scope
+The lookup scope constraint is applied using the `ActiveRecord::Base.merge` method to inject the scope into alias the
+lookup query. The constraint should be a callable object, and is passed a `Rack::Request` object for the current request.
+This can be used to scope alias lookups based on the request subdomain, or other request criteria.
+
+
+```ruby
+# Assuming you have added a `domain` column to the aliases table...
+Director::Configuration.constraints.lookup_scope = lambda do |request|
+  Director::Alias.where(domain: Domain.id_from_host(request.host))
+end
+
+# or returning a callable object for merging
+Director::Configuration.constraints.lookup_scope = proc do
+  -> { where(client: Client.current) }
+end
+```

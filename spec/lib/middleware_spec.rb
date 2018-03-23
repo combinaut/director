@@ -129,6 +129,27 @@ describe Director::Middleware do
 
     it 'matches formats without including the trailing period'
 
+    context 'when a `lookup_scope` constraint is configured' do
+      before { Director::Alias.create!(source_path: request_path, target_path: target_path, handler: 'redirect') }
+      before { allow(Director::Configuration.constraints).to receive(:lookup_scope).and_return constraint }
+      let(:constraint) { proc { -> { where('1=0') } } }
+
+      it 'passes the request object to the scope' do
+        expect(constraint).to receive(:call).with(instance_of(Rack::Request)).and_call_original
+        mock_request.send(request_method, request_path)
+      end
+
+      context 'and the constraint is not met' do
+        let(:constraint) { proc { -> { where('1=0') } } }
+        it_behaves_like 'a pass-through middleware', request_path
+      end
+
+      context 'and the constraint is met' do
+        let(:constraint) { proc { -> { where('1=1') } } }
+        it_behaves_like 'a redirect middleware', request_path, target_path
+      end
+    end
+
     context 'when a `format` constraint is configured' do
       before { Director::Alias.create!(source_path: request_path, target_path: target_path, handler: 'redirect') }
       before { allow(Director::Configuration.constraints.format).to constrain }

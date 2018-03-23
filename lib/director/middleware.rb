@@ -6,7 +6,7 @@ module Director
 
     def call(env)
       @request = Rack::Request.new(env)
-      alias_entry = Director::Alias.resolve(request_path) unless ignored?
+      alias_entry = Director::Alias.resolve_with_constraint(request_path, @request) unless ignored?
       return handle_alias(alias_entry, env)
     end
 
