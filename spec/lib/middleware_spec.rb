@@ -50,6 +50,10 @@ describe Director::Middleware do
       expect(request.path_info).to eq(URI(target_path).path)
     end
 
+    it 'should add director.original_url to the request environment' do
+      expect(request.env['director.original_url']).to eq("#{request.scheme}://#{request.host}#{request_path}")
+    end
+
     it 'should not modify the request_method' do
       expect(request.request_method).to eq(request_method.to_s.upcase)
     end
