@@ -57,6 +57,8 @@ The original URL will be stored in the `director.original_url` request environme
 ### Chaining
 Alias lookups will chain if an alias `target_path` points to `source_path` of another. A `Director::AliasChainLoop`
 exception is raised if a cycle is detected in the alias chain in order to avoid infinite lookups.
+A chain ends when there is no alias with a `source_path` matching the `target_path` of the last
+alias found, or if the last alias found is has a `redirect` handler. A redirect alias ends the chain in order to force the browser to update its url, thus continuing the alias chain lookup in a second request.
 
 ## Constraints
 There are several constraints that can be applied to limit which requests are handled. Each constraint consists of a
