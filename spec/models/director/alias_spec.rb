@@ -13,6 +13,24 @@ describe Director::Alias do
 
   let(:record) { AliasRecordMock.create! }
 
+  describe '::resolve' do
+    let(:alias1) { build_alias(source_path: 'path1', target_path: 'path2') }
+    let(:alias2) { build_alias(source_path: 'path2', target_path: 'path3') }
+    let(:alias3) { build_alias(source_path: 'path3', target_path: 'path4') }
+
+    it 'follows chains of non-redirect aliases where the target_path of one matches the source_path of the next' do
+      [alias1, alias2, alias3].each {|alias_entry| alias_entry.update_attribute(:handler, :proxy) }
+      expect(described_class.resolve('path1')).to eq(alias3)
+    end
+
+    it 'returns a redirect alias immediately when it is not the last alias in a chain' do
+      [alias1, alias3].each {|alias_entry| alias_entry.update_attribute(:handler, :proxy) }
+      alias2.update_attribute(:handler, :redirect)
+
+      expect(described_class.resolve('path1')).to eq(alias2)
+    end
+  end
+
   describe '#save' do
     it 'sets the source_path when a source record is provided' do
       subject.source = record

@@ -29,12 +29,16 @@ module Director
       while alias_entry = find_by_source_path(source_path) do
         raise AliasChainLoop, found.map(&:source_path).joins(' -> ') + source_path if found.include?(alias_entry)
         found << alias_entry
+        break if alias_entry.redirect? # Stop if we reach a redirect since the browser will need to change url at that point
         source_path = alias_entry.target_path
       end
 
       return found.last
     end
 
+    def redirect?
+      handler_class == Handler::Redirect || handler_class < Handler::Redirect
+    end
 
     def handler_class
       handler_name = "Director::Handler::#{handler.classify}"
