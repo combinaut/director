@@ -29,6 +29,13 @@ describe Director::Alias do
 
       expect(described_class.resolve('path1')).to eq(alias2)
     end
+
+    it 'returns the alias preceding a passthrough' do
+      [alias1, alias2].each {|alias_entry| alias_entry.update_attribute(:handler, :proxy) }
+      alias3.update_attribute(:handler, :passthrough)
+
+      expect(described_class.resolve('path1')).to eq(alias2)
+    end
   end
 
   describe '#save' do
