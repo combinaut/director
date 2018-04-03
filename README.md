@@ -95,6 +95,15 @@ Director::Configuration.constraints.target_path.only = %r{\A/pages/}
 Director::Configuration.constraints.target_path.except = %r{\A/admin/}
 ```
 
+### Request
+The request constraint yields the request itself to a given proc. This can be used to ignore asset requests or only
+apply aliasing based on any aspect of the request, for example, params, host name, etc.
+```ruby
+Director::Configuration.constraints.request.only = ->(request) { request.params['my_param'] == 'false' }
+# or
+Director::Configuration.constraints.request.except = ->(request) { request.env['HTTP_HOST'] == 'testing.test' }
+```
+
 ### Lookup Scope
 The lookup scope constraint is applied using the `ActiveRecord::Base.merge` method to inject the scope into alias the
 lookup query. The constraint should be a callable object, and is passed a `Rack::Request` object for the current request.

@@ -10,6 +10,7 @@ module Director
     @@constraints = OpenStruct.new({
       source_path: Constraint.new,
       target_path: Constraint.new,
+      request: Constraint.new,
       format: Constraint.new,
       lookup_scope: ->(request) { {} }
     })

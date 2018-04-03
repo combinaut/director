@@ -7,7 +7,7 @@ module Director
     def call(env)
       @request = Rack::Request.new(env)
       env['director.original_url'] = @request.url
-      
+
       alias_entry = Director::Alias.resolve_with_constraint(request_path, @request) unless ignored?
       return handle_alias(alias_entry, env)
     end
@@ -19,7 +19,7 @@ module Director
     end
 
     def ignored?
-      ignored_format?(format) || ignored_path?(request_path)
+      ignored_format?(format) || ignored_path?(request_path) || ignored_request?(@request)
     end
 
     def ignored_format?(format)
@@ -28,6 +28,10 @@ module Director
 
     def ignored_path?(path)
       !Helpers.matches_constraint?(Configuration.constraints.source_path, path)
+    end
+
+    def ignored_request?(request)
+      !Helpers.matches_constraint?(Configuration.constraints.request, request)
     end
 
     def format

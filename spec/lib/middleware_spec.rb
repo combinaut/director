@@ -174,6 +174,26 @@ describe Director::Middleware do
       end
     end
 
+    context 'when a `request` constraint is configured' do
+      before { Director::Alias.create!(source_path: request_path, target_path: target_path, handler: 'redirect') }
+      before { allow(Director::Configuration.constraints.request).to constrain }
+
+      context 'and the request is not in the whitelist' do
+        let(:constrain) { receive(:only).and_return(->(request) { false }) }
+        it_behaves_like 'a pass-through middleware', request_path
+      end
+
+      context 'and the request is in the blacklist' do
+        let(:constrain) { receive(:except).and_return(->(request) { true }) }
+        it_behaves_like 'a pass-through middleware', request_path
+      end
+
+      context 'and the request is in the whitelist' do
+        let(:constrain) { receive(:only).and_return(->(request) { true }) }
+        it_behaves_like 'a redirect middleware', request_path, target_path
+      end
+    end
+
     context 'when a String `source_path` constraint is configured' do
       before { Director::Alias.create!(source_path: request_path, target_path: target_path, handler: 'redirect') }
       before { allow(Director::Configuration.constraints.source_path).to constrain }
