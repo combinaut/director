@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    director (0.3.4)
+    director (0.3.6)
       rails (>= 4.2)
 
 GEM
