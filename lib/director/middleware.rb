@@ -1,14 +1,25 @@
 module Director
   class Middleware
+    def self.handled_request?(request)
+      request.env['director.original_url'].present?
+    end
+
+    def self.original_request_url(request)
+      request.env['director.original_url'] || request.url
+    end
+
     def initialize(app)
       @app = app
     end
 
     def call(env)
       @request = Rack::Request.new(env)
-      env['director.original_url'] = @request.url
 
-      alias_entry = Director::Alias.resolve_with_constraint(request_path, @request) unless ignored?
+      unless ignored?
+        env['director.original_url'] = @request.url
+        alias_entry = Director::Alias.resolve_with_constraint(request_path, @request)
+      end
+
       return handle_alias(alias_entry, env)
     end
 

@@ -1,11 +1,32 @@
 require 'spec_helper'
 
 describe Director::Middleware do
-
   let(:app) { MockRackApp.new }
   let(:middleware) { described_class.new(app) }
   let(:mock_request) { Rack::MockRequest.new(middleware) }
   let(:request) { Rack::Request.new(app.env) }
+
+  describe '::original_request_url' do
+    it 'returns the original request url' do
+      original_url = 'http://www.test.com/some/path'
+      mock_request.get original_url
+      expect(Director::Middleware.original_request_url(request)).to eq(original_url)
+    end
+  end
+
+  describe '::handled_request?' do
+    it 'returns true if the request was not ignored' do
+      expect(middleware).to receive(:ignored?).and_return(false)
+      mock_request.get 'http://www.test.com/some/path'
+      expect(Director::Middleware.handled_request?(request)).to be_truthy
+    end
+
+    it 'returns true if the request was ignored' do
+      expect(middleware).to receive(:ignored?).and_return(true)
+      mock_request.get 'http://www.test.com/some/path'
+      expect(Director::Middleware.handled_request?(request)).to be_falsey
+    end
+  end
 
   shared_examples_for 'a pass-through middleware' do |request_path|
     before do
@@ -48,10 +69,6 @@ describe Director::Middleware do
 
     it 'should set the path to the target_path' do
       expect(request.path_info).to eq(URI(target_path).path)
-    end
-
-    it 'should add director.original_url to the request environment' do
-      expect(request.env['director.original_url']).to eq("#{request.scheme}://#{request.host}#{request_path}")
     end
 
     it 'should not modify the request_method' do

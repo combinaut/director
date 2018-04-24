@@ -51,9 +51,6 @@ end
 Url "params" or "query" from the request will be passed on and merged with target path. Any url params in the target path
 will be preserved.
 
-### Original URL
-The original URL will be stored in the `director.original_url` request environment variable. This is sometimes useful when the application needs to know what the URL was before it was modified by Director.
-
 ### Chaining
 Alias lookups will chain if an alias `target_path` points to `source_path` of another. A `Director::AliasChainLoop`
 exception is raised if a cycle is detected in the alias chain in order to avoid infinite lookups.
@@ -120,4 +117,13 @@ end
 Director::Configuration.constraints.lookup_scope = proc do
   -> { where(client: Client.current) }
 end
+```
+
+## Request Information
+Sometimes it may be useful to know what the request url was before Director modified it, or know if Director handled the
+request or ignored it due to constraints.
+
+```ruby
+Director::Middleware.original_request_url(request) # => Original request url before Director handled it
+Director::Middleware.handled_request?(request) # => Boolean indicating whether or not Director handled the request
 ```
