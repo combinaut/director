@@ -27,7 +27,7 @@ module Director
 
       # Traverse a chain of aliases
       while alias_entry = find_by_source_path(source_path) do
-        raise AliasChainLoop, found.map(&:source_path).joins(' -> ') + source_path if found.include?(alias_entry)
+        raise AliasChainLoop, [*found.map(&:source_path), source_path].join(' -> ') if found.include?(alias_entry)
         break if alias_entry.passthrough? # Stop if we reach a passthrough since the app will handle this
         found << alias_entry
         break if alias_entry.redirect? # Stop if we reach a redirect since the browser will need to change url at that point
