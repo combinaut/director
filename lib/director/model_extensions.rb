@@ -37,15 +37,17 @@ module Director
 
       def generate_canonical_path
         generator = aliased_paths_options[:canonical_path]
-        case generator
-        when Symbol
-          send(generator)
-        when Proc
-          generator.call(self)
-        when String
-          generator
-        else # Assume it's an object that responds to canonical_path
-          generator.send(:canonical_path)
+        Alias.sanitize_path do
+          case generator
+          when Symbol
+            send(generator)
+          when Proc
+            generator.call(self)
+          when String
+            generator
+          else # Assume it's an object that responds to canonical_path
+            generator.send(:canonical_path)
+          end
         end
       end
 

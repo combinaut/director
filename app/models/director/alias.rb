@@ -3,11 +3,12 @@ module Director
     belongs_to :source, polymorphic: true
     belongs_to :target, polymorphic: true
 
+    before_validation :sanitize_path
     validates_presence_of :source_path, unless: :source
     validates_presence_of :target_path, unless: :target
     validates_format_of :source_path, with: Configuration.constraints.source_path.only
-    validates_format_of :source_path, without: Configuration.constraints.source_path.except
     validates_format_of :target_path, with: Configuration.constraints.target_path.only
+    validates_format_of :source_path, without: Configuration.constraints.source_path.except
     validates_format_of :target_path, without: Configuration.constraints.target_path.except
     validate :valid_handler
 
@@ -37,6 +38,13 @@ module Director
       return found.last
     end
 
+    def self.sanitize_path(path = nil, &block)
+      path = block.call if block_given?
+      path = path.to_s
+      path = path.strip
+      return path
+    end
+
     def redirect?
       handler_class <= Handler::Redirect
     end
@@ -57,6 +65,11 @@ module Director
     end
 
     private
+
+    def sanitize_path
+      self.source_path = self.class.sanitize_path(source_path)
+      self.target_path = self.class.sanitize_path(target_path)
+    end
 
     def set_source_path
       self.source_path = source.generate_canonical_path if source

@@ -71,6 +71,16 @@ describe Director::Alias do
       expect { subject.save }.to change { subject.source_path }.to record.canonical_path
     end
 
+    it 'removes leading and trailing whitespace from source_path' do
+      subject.attributes = { source_path: '/asdf    ' }
+      expect { subject.save }.to change { subject.source_path }.to '/asdf'
+    end
+
+    it 'removes leading and trailing whitespace from target_path' do
+      subject.attributes = { target_path: '/asdf    ' }
+      expect { subject.save }.to change { subject.target_path }.to '/asdf'
+    end
+
     it 'raises an exception if redirection aliases would result in a loop'
   end
 
@@ -83,6 +93,10 @@ describe Director::Alias do
 
     it 'returns false if the handler does not exist' do
       expect { subject.handler = 'FakeHandler' }.to change { subject.valid? }.to false
+    end
+
+    end
+
     end
   end
 end
