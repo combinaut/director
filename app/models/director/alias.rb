@@ -10,6 +10,7 @@ module Director
     validates_format_of :target_path, with: Configuration.constraints.target_path.only
     validates_format_of :source_path, without: Configuration.constraints.source_path.except
     validates_format_of :target_path, without: Configuration.constraints.target_path.except
+    validate :valid_paths
     validate :valid_handler
 
     scope :with_source_path, -> { where.not(source_path: nil) }
@@ -36,6 +37,12 @@ module Director
       end
 
       return found.last
+    end
+
+    def self.valid_uri?(url)
+      !!URI(url)
+    rescue URI::InvalidURIError
+      false
     end
 
     def self.sanitize_path(path = nil, &block)
@@ -91,6 +98,11 @@ module Director
       handler_class
     rescue MissingAliasHandler
       errors.add(:handler, 'not defined')
+    end
+
+    def valid_paths
+      errors.add(:source_path, 'is not a valid') unless self.class.valid_uri?(source_path)
+      errors.add(:target_path, 'is not a valid') unless self.class.valid_uri?(target_path)
     end
   end
 
