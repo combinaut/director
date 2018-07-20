@@ -61,13 +61,13 @@ describe Director::Alias do
 
     it 'sets the target_path if a target is already present, even if a target_path is set to something else' do
       subject.update_attribute(:target, record)
-      subject.attributes = { target_path: 'asdf' }
+      subject.attributes = { target_path: '/asdf' }
       expect { subject.save }.to change { subject.target_path }.to record.canonical_path
     end
 
     it 'sets the source_path if a source is already present, even if a source_path is set to something else' do
       subject.update_attribute(:source, record)
-      subject.attributes = { source_path: 'asdf' }
+      subject.attributes = { source_path: '/asdf' }
       expect { subject.save }.to change { subject.source_path }.to record.canonical_path
     end
 
@@ -95,8 +95,24 @@ describe Director::Alias do
       expect { subject.handler = 'FakeHandler' }.to change { subject.valid? }.to false
     end
 
+    it 'returns false if source_path includes interior whitespace' do
+      expect { subject.source_path = '/this is/a/test' }.to change { subject.valid? }.to false
     end
 
+    it 'returns false if target_path includes interior whitespace' do
+      expect { subject.target_path = '/this is/a/test' }.to change { subject.valid? }.to false
+    end
+
+    it 'returns false if source_path is relative and does not start with a slash' do
+      expect { subject.source_path = 'this/is/a/test' }.to change { subject.valid? }.to false
+    end
+
+    it 'returns false if target_path is relative and does not start with a slash' do
+      expect { subject.target_path = 'this/is/a/test' }.to change { subject.valid? }.to false
+    end
+
+    it 'returns returns true if target_path is absolute and does not start with a slash' do
+      expect { subject.target_path = 'http://www.this.com/is/a/test' }.not_to change { subject.valid? }.from true
     end
   end
 end

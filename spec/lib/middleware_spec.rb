@@ -95,7 +95,7 @@ describe Director::Middleware do
     end
 
     context 'when an alias exists but does not match' do
-      before { Director::Alias.create!(source_path: 'does/not/match', target_path: target_path, handler: 'redirect') }
+      before { Director::Alias.create!(source_path: '/does/not/match', target_path: target_path, handler: 'redirect') }
 
       it_behaves_like 'a pass-through middleware', request_path
     end

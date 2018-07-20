@@ -10,6 +10,8 @@ module Director
     validates_format_of :target_path, with: Configuration.constraints.target_path.only
     validates_format_of :source_path, without: Configuration.constraints.source_path.except
     validates_format_of :target_path, without: Configuration.constraints.target_path.except
+    validates_format_of :source_path, with: %r{\A/}, if: :source_path_relative?, message: 'is a relative path so it must start with a slash'
+    validates_format_of :target_path, with: %r{\A/}, if: :target_path_relative?, message: 'is a relative path so it must start with a slash'
     validate :valid_paths
     validate :valid_handler
 
@@ -41,6 +43,12 @@ module Director
 
     def self.valid_uri?(url)
       !!URI(url)
+    rescue URI::InvalidURIError
+      false
+    end
+
+    def self.relative?(url)
+      URI(url).relative?
     rescue URI::InvalidURIError
       false
     end
@@ -92,6 +100,14 @@ module Director
 
     def target_changed?
       target_path_changed? || target_id_changed? || target_type_changed?
+    end
+
+    def source_path_relative?
+      self.class.relative?(source_path) if source_path?
+    end
+
+    def target_path_relative?
+      self.class.relative?(target_path) if target_path?
     end
 
     def valid_handler
