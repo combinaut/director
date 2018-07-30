@@ -1,7 +1,7 @@
-require 'director/handlers/base'
-require 'director/handlers/passthrough'
-require 'director/handlers/proxy'
-require 'director/handlers/redirect'
+require 'director/handler/base'
+require 'director/handler/passthrough'
+require 'director/handler/proxy'
+require 'director/handler/redirect'
 require 'director/model_extensions'
 
 module Director
