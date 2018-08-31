@@ -36,6 +36,11 @@ describe Director::Alias do
 
       expect(described_class.resolve('path1')).to eq(alias2)
     end
+
+    it 'ignores trailing slashes' do
+      alias1.update_attribute(:handler, :redirect)
+      expect(described_class.resolve(alias1.source_path + '/')).to eq(alias1)
+    end
   end
 
   describe '#save' do

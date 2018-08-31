@@ -27,6 +27,7 @@ module Director
 
     # Returns the alias matching the source_path, traversing any chained aliases and returning the last one
     def self.resolve(source_path)
+      source_path = sanitize_path(source_path)
       found = []
 
       # Traverse a chain of aliases
@@ -57,6 +58,7 @@ module Director
       path = block.call if block_given?
       path = path.to_s
       path = path.strip
+      path = path.remove(%r{/$})
       return path
     end
 
