@@ -127,3 +127,9 @@ request or ignored it due to constraints.
 Director::Middleware.original_request_url(request) # => Original request url before Director handled it
 Director::Middleware.handled_request?(request) # => Boolean indicating whether or not Director handled the request
 ```
+
+## Upgrading from an older version
+
+### 1.1.x to 1.2.0
+
+Alias resolution is now case insensitive. All incoming paths are downcased before saving or resolving. If you have existing aliases, you should call `#save` on each one to trigger the path sanitizer which will downcase the saved paths so the the downcased paths coming in to the `#resolve` method.

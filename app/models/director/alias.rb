@@ -58,6 +58,7 @@ module Director
       path = block.call if block_given?
       path = path.to_s
       path = path.strip
+      path = path.downcase
       path = path.remove(%r{/$}) if path.length > 1
       return path
     end

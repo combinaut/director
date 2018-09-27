@@ -46,6 +46,11 @@ describe Director::Alias do
       alias1.update_attributes!(source_path: ' / ', handler: :redirect)
       expect(described_class.resolve('   /    ')).to eq(alias1)
     end
+
+    it 'is case insensitive' do
+      alias1.update_attributes(handler: :redirect, source_path: '/camelCasePath')
+      expect(described_class.resolve(alias1.source_path.upcase)).to eq(alias1)
+    end
   end
 
   describe '#save' do
