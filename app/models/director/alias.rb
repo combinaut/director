@@ -28,18 +28,18 @@ module Director
     # Returns the alias matching the source_path, traversing any chained aliases and returning the last one
     def self.resolve(source_path)
       source_path = sanitize_path(source_path)
-      found = []
+      found = {}
 
       # Traverse a chain of aliases
       while alias_entry = find_by_source_path(source_path) do
-        raise AliasChainLoop, [*found.map(&:source_path), source_path].join(' -> ') if found.include?(alias_entry)
+        raise AliasChainLoop, [*found.keys, source_path].join(' -> ') if found.key?(alias_entry.target_path)
         break if alias_entry.passthrough? # Stop if we reach a passthrough since the app will handle this
-        found << alias_entry
+        found[source_path] = alias_entry
         break if alias_entry.redirect? # Stop if we reach a redirect since the browser will need to change url at that point
         source_path = alias_entry.target_path
       end
 
-      return found.last
+      return found.values.last
     end
 
     def self.valid_uri?(url)
@@ -84,6 +84,15 @@ module Director
 
     private
 
+    def valid_paths
+      source_path = source_changed? && source ? source.generate_canonical_path : self.source_path
+      target_path = target_changed? && target ? target.generate_canonical_path : self.target_path
+
+      errors.add(:source_path, 'is not a valid') unless self.class.valid_uri?(source_path)
+      errors.add(:target_path, 'is not a valid') unless self.class.valid_uri?(target_path)
+      errors.add(:target_path, 'cannot be the same as the source path') if source_path == target_path
+    end
+
     def sanitize_path
       self.source_path = self.class.sanitize_path(source_path)
       self.target_path = self.class.sanitize_path(target_path)
@@ -117,11 +126,6 @@ module Director
       handler_class
     rescue MissingAliasHandler
       errors.add(:handler, 'not defined')
-    end
-
-    def valid_paths
-      errors.add(:source_path, 'is not a valid') unless self.class.valid_uri?(source_path)
-      errors.add(:target_path, 'is not a valid') unless self.class.valid_uri?(target_path)
     end
   end
 

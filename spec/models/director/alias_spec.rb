@@ -51,6 +51,18 @@ describe Director::Alias do
       alias1.update_attributes(handler: :redirect, source_path: '/camelCasePath')
       expect(described_class.resolve(alias1.source_path.upcase)).to eq(alias1)
     end
+
+    it 'raises an exception if an alias chain loop is detected on a proxy alias' do
+      [alias1, alias2, alias3].each {|alias_entry| alias_entry.update_attribute(:handler, :proxy) }
+      alias3.update_attribute(:target_path, alias1.source_path)
+      expect { described_class.resolve(alias1.source_path) }.to raise_exception(Director::AliasChainLoop)
+    end
+
+    it 'raises an exception if an alias chain loop is detected on a redirect alias' do
+      [alias1, alias2].each {|alias_entry| alias_entry.update_attribute(:handler, :proxy) }
+      alias3.update_attributes(handler: :redirect, target_path: alias1.source_path)
+      expect { described_class.resolve(alias1.source_path) }.to raise_exception(Director::AliasChainLoop)
+    end
   end
 
   describe '#save' do
@@ -128,6 +140,10 @@ describe Director::Alias do
 
     it 'returns returns true if target_path is absolute and does not start with a slash' do
       expect { subject.target_path = 'http://www.this.com/is/a/test' }.not_to change { subject.valid? }.from true
+    end
+
+    it 'returns false if the `source_path` and the `target_path` are equal' do
+      expect { subject.target_path = subject.source_path }.to change { subject.valid? }.to false
     end
   end
 end

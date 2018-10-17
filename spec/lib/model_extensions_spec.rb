@@ -5,7 +5,7 @@ describe Director::ModelExtensions do
     has_aliased_paths canonical_path: :canonical_path
 
     def canonical_path
-      '/canonical/path/from/mock'
+      "/canonical/path/from/mock#{id}"
     end
   end
 
