@@ -15,18 +15,6 @@ describe Director::Middleware do
   end
 
   describe '::handled_request?' do
-    it 'returns true if the request was not ignored' do
-      expect(middleware).to receive(:ignored?).and_return(false)
-      mock_request.get 'http://www.test.com/some/path'
-      expect(Director::Middleware.handled_request?(request)).to be_truthy
-    end
-
-    it 'returns true if the request was ignored' do
-      expect(middleware).to receive(:ignored?).and_return(true)
-      mock_request.get 'http://www.test.com/some/path'
-      expect(Director::Middleware.handled_request?(request)).to be_falsey
-    end
-
     it 'returns true if get request' do
       mock_request.get 'http://www.test.com/some/path'
       expect(Director::Middleware.handled_request?(request)).to be_truthy
