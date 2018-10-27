@@ -15,38 +15,43 @@ describe Director::Middleware do
   end
 
   describe '::handled_request?' do
-    it 'returns true if get request' do
+    it 'returns true if GET request' do
       mock_request.get 'http://www.test.com/some/path'
       expect(Director::Middleware.handled_request?(request)).to be_truthy
     end
 
-    it 'returns true if head request' do
+    it 'returns true if HEAD request' do
       mock_request.head 'http://www.test.com/some/path'
       expect(Director::Middleware.handled_request?(request)).to be_truthy
     end
 
-    it 'returns false if post request' do
+    it 'returns false if POST request' do
       mock_request.post 'http://www.test.com/some/path'
       expect(Director::Middleware.handled_request?(request)).to be_falsey
     end
 
-    it 'returns false if patch request' do
+    it 'returns false if PATCH request' do
       mock_request.patch 'http://www.test.com/some/path'
       expect(Director::Middleware.handled_request?(request)).to be_falsey
     end
 
-    it 'returns false if delete request' do
+    it 'returns false if DELETE request' do
       mock_request.delete 'http://www.test.com/some/path'
       expect(Director::Middleware.handled_request?(request)).to be_falsey
     end
 
-    context 'request constraints reconfigured' do
+    context 'when the request constraint is reconfigured' do
       before { allow(Director::Configuration.constraints.request).to receive(:only).and_return constraint }
       let(:constraint) { ->(request) { request.post? } }
 
-      it 'returns true if constraint allows request' do
+      it 'returns true if the constraint allows request' do
         mock_request.post 'http://www.test.com/some/path'
         expect(Director::Middleware.handled_request?(request)).to be_truthy
+      end
+
+      it 'returns false if the constraint does not allow request' do
+        mock_request.get 'http://www.test.com/some/path'
+        expect(Director::Middleware.handled_request?(request)).to be_falsey
       end
     end
   end
