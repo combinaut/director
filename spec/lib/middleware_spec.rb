@@ -26,6 +26,41 @@ describe Director::Middleware do
       mock_request.get 'http://www.test.com/some/path'
       expect(Director::Middleware.handled_request?(request)).to be_falsey
     end
+
+    it 'returns true if get request' do
+      mock_request.get 'http://www.test.com/some/path'
+      expect(Director::Middleware.handled_request?(request)).to be_truthy
+    end
+
+    it 'returns true if head request' do
+      mock_request.head 'http://www.test.com/some/path'
+      expect(Director::Middleware.handled_request?(request)).to be_truthy
+    end
+
+    it 'returns false if post request' do
+      mock_request.post 'http://www.test.com/some/path'
+      expect(Director::Middleware.handled_request?(request)).to be_falsey
+    end
+
+    it 'returns false if patch request' do
+      mock_request.patch 'http://www.test.com/some/path'
+      expect(Director::Middleware.handled_request?(request)).to be_falsey
+    end
+
+    it 'returns false if delete request' do
+      mock_request.delete 'http://www.test.com/some/path'
+      expect(Director::Middleware.handled_request?(request)).to be_falsey
+    end
+
+    context 'request constraints reconfigured' do
+      before { allow(Director::Configuration.constraints.request).to receive(:only).and_return constraint }
+      let(:constraint) { ->(request) { request.post? } }
+
+      it 'returns true if constraint allows request' do
+        mock_request.post 'http://www.test.com/some/path'
+        expect(Director::Middleware.handled_request?(request)).to be_truthy
+      end
+    end
   end
 
   shared_examples_for 'a pass-through middleware' do |request_path|
