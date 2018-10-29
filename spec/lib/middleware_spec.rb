@@ -15,16 +15,44 @@ describe Director::Middleware do
   end
 
   describe '::handled_request?' do
-    it 'returns true if the request was not ignored' do
-      expect(middleware).to receive(:ignored?).and_return(false)
+    it 'returns true if the request is a GET' do
       mock_request.get 'http://www.test.com/some/path'
       expect(Director::Middleware.handled_request?(request)).to be_truthy
     end
 
-    it 'returns true if the request was ignored' do
-      expect(middleware).to receive(:ignored?).and_return(true)
-      mock_request.get 'http://www.test.com/some/path'
+    it 'returns true if the request is a HEAD' do
+      mock_request.head 'http://www.test.com/some/path'
+      expect(Director::Middleware.handled_request?(request)).to be_truthy
+    end
+
+    it 'returns false if the request is a POST' do
+      mock_request.post 'http://www.test.com/some/path'
       expect(Director::Middleware.handled_request?(request)).to be_falsey
+    end
+
+    it 'returns false if the request is a PATCH' do
+      mock_request.patch 'http://www.test.com/some/path'
+      expect(Director::Middleware.handled_request?(request)).to be_falsey
+    end
+
+    it 'returns false if the request is a DELETE' do
+      mock_request.delete 'http://www.test.com/some/path'
+      expect(Director::Middleware.handled_request?(request)).to be_falsey
+    end
+
+    context 'when the default request constraint is reconfigured' do
+      before { allow(Director::Configuration.constraints.request).to receive(:only).and_return constraint }
+      let(:constraint) { ->(request) { request.post? } }
+
+      it 'returns true if the constraint allows the request' do
+        mock_request.post 'http://www.test.com/some/path'
+        expect(Director::Middleware.handled_request?(request)).to be_truthy
+      end
+
+      it 'returns false if the constraint does not allow the request' do
+        mock_request.get 'http://www.test.com/some/path'
+        expect(Director::Middleware.handled_request?(request)).to be_falsey
+      end
     end
   end
 

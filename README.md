@@ -94,7 +94,8 @@ Director::Configuration.constraints.target_path.except = %r{\A/admin/}
 
 ### Request
 The request constraint yields the request itself to a given proc. This can be used to ignore asset requests or only
-apply aliasing based on any aspect of the request, for example, params, host name, etc.
+apply aliasing based on any aspect of the request, for example, params, host name, etc.<sup id="footnote_ref_1">[1](#footnote_1)</sup>
+
 ```ruby
 Director::Configuration.constraints.request.only = ->(request) { request.params['my_param'] == 'false' }
 # or
@@ -133,3 +134,6 @@ Director::Middleware.handled_request?(request) # => Boolean indicating whether o
 ### 1.1.x to 1.2.0
 
 Alias resolution is now case insensitive. All incoming paths are downcased before saving or resolving. If you have existing aliases, you should call `#save` on each one to trigger the path sanitizer which will downcase the saved paths so the the downcased paths coming in to the `#resolve` method.
+
+## Footnotes
+<span id="footnote_1">1.</span> By default, Director only handles GET and HEAD requests because the `redirect` handler cannot tell the browser to redirect a POST. The `proxy` handler could internally redirect a POST to an aliased target path, but this dichotomy adds too much complexity for it to be enabled out of the box. The constraints configuration gives you full control over which requests are handled by Director in your application. [↩](#footnote_ref_1)
