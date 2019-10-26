@@ -5,7 +5,7 @@ require "director/version"
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
-  s.name        = "director"
+  s.name        = "combinaut_director"
   s.version     = Director::VERSION
   s.authors     = ["Ryan Wallace", "Nicholas Jakobsen"]
   s.email       = ["hello@combinaut.com"]
