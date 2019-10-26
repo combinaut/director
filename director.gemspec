@@ -8,8 +8,8 @@ Gem::Specification.new do |s|
   s.name        = "director"
   s.version     = Director::VERSION
   s.authors     = ["Ryan Wallace", "Nicholas Jakobsen"]
-  s.email       = ["contact@culturecode.ca"]
-  s.homepage    = "http://github.com/culturecode/director"
+  s.email       = ["hello@combinaut.com"]
+  s.homepage    = "http://github.com/combinaut/director"
   s.summary     = "Rack Middleware that handles directs incoming requests to their aliased path targets"
   s.description = "Rack Middleware that handles directs incoming requests to their aliased path targets"
 
