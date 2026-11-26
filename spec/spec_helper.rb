@@ -1,10 +1,9 @@
 require 'bundler'
 Bundler.require :default, :development
 
-# If you're using all parts of Rails:
-Combustion.initialize! :all
-# Or, load just what you need:
-# Combustion.initialize! :active_record, :action_controller
+Combustion.initialize! :active_record, :action_controller do
+  config.active_record.belongs_to_required_by_default = false
+end
 
 require 'rspec/rails'
 require 'director'
