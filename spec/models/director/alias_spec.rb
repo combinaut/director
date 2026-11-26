@@ -43,12 +43,12 @@ describe Director::Alias do
     end
 
     it 'does not ignore trailing slash on a root path' do
-      alias1.update_attributes!(source_path: ' / ', handler: :redirect)
+      alias1.update!(source_path: ' / ', handler: :redirect)
       expect(described_class.resolve('   /    ')).to eq(alias1)
     end
 
     it 'is case insensitive' do
-      alias1.update_attributes(handler: :redirect, source_path: '/camelCasePath')
+      alias1.update(handler: :redirect, source_path: '/camelCasePath')
       expect(described_class.resolve(alias1.source_path.upcase)).to eq(alias1)
     end
 
@@ -60,7 +60,7 @@ describe Director::Alias do
 
     it 'raises an exception if an alias chain loop is detected on a redirect alias' do
       [alias1, alias2].each {|alias_entry| alias_entry.update_attribute(:handler, :proxy) }
-      alias3.update_attributes(handler: :redirect, target_path: alias1.source_path)
+      alias3.update(handler: :redirect, target_path: alias1.source_path)
       expect { described_class.resolve(alias1.source_path) }.to raise_exception(Director::AliasChainLoop)
     end
   end

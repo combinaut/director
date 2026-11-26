@@ -16,7 +16,8 @@ Gem::Specification.new do |s|
   s.files = Dir["{app}/**/*"] + Dir["{lib}/**/*"] + ["MIT-LICENSE", "README.md"]
 
   s.add_dependency "rails", ">= 4.2"
-  s.add_development_dependency 'combustion', '~> 0.7.0'
-  s.add_development_dependency 'rspec-rails', '~> 3.6'
+  s.add_dependency "ostruct"
+  s.add_development_dependency 'combustion', '~> 1.7.0'
+  s.add_development_dependency 'rspec-rails', '~> 8.0'
   s.add_development_dependency 'sqlite3'
 end

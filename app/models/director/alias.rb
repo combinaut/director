@@ -1,7 +1,7 @@
 module Director
   class Alias < ActiveRecord::Base
-    belongs_to :source, polymorphic: true
-    belongs_to :target, polymorphic: true
+    belongs_to :source, polymorphic: true, optional: true
+    belongs_to :target, polymorphic: true, optional: true
 
     before_validation :sanitize_path
     validates_presence_of :source_path, unless: :source
